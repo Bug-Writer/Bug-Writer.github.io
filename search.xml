@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title><![CDATA[如何深度优化Hexo]]></title>
+    <url>%2F20190317%2F%E5%A6%82%E4%BD%95%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%8C%96Hexo%2F</url>
+    <content type="text"><![CDATA[将Hexo变得更加优美本篇博文长期维护，如果找到了新的优化马上会放上来啦 本文基于NexT主题测试有效，不保证其它主题的可用性 在NexT主题里，custom.styl才是最好用的工具啊！ 站点标题自定义默认的样子太丑？把想法写在custom.styl里面！~/.../themes/next/source/css/_custom/custom.styl12345678.site-title &#123; font-family: ???; font-size: ???px; font-weight: ???; color: rgb(???, ???, ???); line-height: ???px; letter-spacing: ???px;&#125; 都是字面意思，实在不懂的 $hexo\,\,s$ 一下看看效果 主题自带样式note标签这里选择的是最简单的方式，不会有奇怪的显示bug default 1&lt;div class="note default"&gt;&lt;p&gt;default&lt;/p&gt;&lt;/div&gt; primary 1&lt;div class="note primary"&gt;&lt;p&gt;primary&lt;/p&gt;&lt;/div&gt; success 1&lt;div class="note success"&gt;&lt;p&gt;success&lt;/p&gt;&lt;/div&gt; info 1&lt;div class="note info"&gt;&lt;p&gt;info&lt;/p&gt;&lt;/div&gt; warning 1&lt;div class="note warning"&gt;&lt;p&gt;warning&lt;/p&gt;&lt;/div&gt; danger 1&lt;div class="note danger"&gt;&lt;p&gt;danger&lt;/p&gt;&lt;/div&gt; danger no-icon 1&lt;div class="note danger no-icon"&gt;&lt;p&gt;danger no-icon&lt;/p&gt;&lt;/div&gt;]]></content>
+      <categories>
+        <category>skills</category>
+      </categories>
+      <tags>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[[BZOJ1901] 带修区间第k小]]></title>
+    <url>%2F20190309%2FBZOJ1901-%E5%B8%A6%E4%BF%AE%E5%8C%BA%E9%97%B4%E7%AC%ACk%E5%B0%8F%2F</url>
+    <content type="text"><![CDATA[论暴力如何摩擦正解本文介绍的并非正解，而是高效的暴力 Description给定一个含有n个数的序列$a[1],a[2],a[3]……a[n]$，程序必须回答这样的询问：对于给定的i,j,k，在$a[i],a[i + 1],a[i + 2]……a[j]$中第k小的数是多少($1 ≤ k ≤ j - i + 1$)，并且，你可以改变一些$a[i]$的值，改变后，程序还能针对改变后的a继续回答上面的问题. Format第一行有两个正整数n($1≤n≤50000$)，m($1≤m≤50000$)。分别表示序列的长度和指令的个数．第二行有n个数，表示$a[1],a[2]……a[n]$，这些数都小于$10^9$。接下来的m行描述每条指令每行的格式是下面两种格式中的一种. $Q\,i\,j\,k$或者$C\,i\,t$ $Q\,i\,j\,k$ （i,j,k是数字，$1≤i≤j≤n$, $1≤k≤j-i+1$）表示询问指令，询问$a[i]，a[i+1]……a[j]$中第k小的数．$C\,i\,t$ ($1≤i≤n$，$0≤t≤10^9$)表示把$a[i]$改变成为t SampleInput123455 33 2 1 4 7Q 1 4 3C 2 6Q 2 5 3 Output1236 DataSizeIn Format Analyze哦这不是主席树套(线段树/树状数组)的板子嘛所以不能这样打 我要分块 具体方法如下： 将数列分块，并对每个块排序 二分最小值，再二分每个区间内比它大的最小的数的位置，因为块内有序所以可以求出块内对排名的贡献 修改需要对所在块重新sort，（复杂度可以更优不过意义不大） 准备好足够的时间来调试你的分块！ 以下是分块代码！1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950#include &lt;cstdio&gt;#include &lt;algorithm&gt;#include &lt;cmath&gt;#define RI register int#define Min(x,y) (x) &gt; (y) ? (x) = (y) : 0#define Max(x,y) (x) &lt; (y) ? (x) = (y) : 0using namespace std;const int maxn = 100005;int blk1[maxn], blk2[maxn], n, m, siz, mi = 1e9, mx = -1, l, r, k;char q[10];inline void Query(RI L, RI R, RI K) &#123; RI ll = L / siz, rr = R / siz, mid = 0, num = 0, ls = mi, rs = mx; while (ls &lt;= rs) &#123; mid = (ls + rs) &gt;&gt; 1, num = 0; if (ll == rr) &#123; for (RI i = L; i &lt;= R; ++i) if (blk1[i] &lt; mid) ++num; &#125; else &#123; for (RI i = L; i &lt; siz * (ll + 1); ++i) if (blk1[i] &lt; mid) ++num; for (RI i = ll + 1; i &lt; rr; ++i) num += lower_bound(blk2 + i * siz, blk2 + (i + 1) * siz, mid) - (blk2 + i * siz); for (RI i = siz * rr; i &lt;= R; ++i) if (blk1[i] &lt; mid) ++num; &#125; if (num &lt; k) ls = mid + 1; else rs = mid - 1; &#125; printf("%d\n", ls - 1); return;&#125;inline void Modify(RI u, RI K) &#123; RI ll = u / siz * siz, rr = min((u / siz + 1) * siz, n); blk1[u] = k, Min(mi, k), Max(mx, k); for (RI i = ll; i &lt; rr; ++i) blk2[i] = blk1[i]; sort(blk2 + ll, blk2 + rr); return;&#125;int main() &#123; scanf("%d%d", &amp;n, &amp;m), siz = sqrt(n + 1.); for (RI i = 0; i &lt; n; ++i) scanf("%d", blk1 + i), blk2[i] = blk1[i], Min(mi, blk1[i]), Max(mx, blk1[i]); for (RI i = 0; i &lt; n; i += siz) sort(blk2 + i, blk2 + min(i + siz, n)); while (m--) &#123; scanf("%s", q); if (q[0] == 'Q') scanf("%d%d%d", &amp;l, &amp;r, &amp;k), Query(l - 1, r - 1, k); else scanf("%d%d", &amp;l, &amp;k), Modify(l - 1, k); &#125;&#125;]]></content>
+      <categories>
+        <category>Problem</category>
+      </categories>
+      <tags>
+        <tag>分块</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[[SP7586] Number of Palindromes]]></title>
+    <url>%2F20190307%2FSP7586-Number-of-Palindromes%2F</url>
+    <content type="text"><![CDATA[一道板子题Description求给定字符串中回文串的个数 题意够显然了，懒得放样例了 来复习复习马拉车. 马拉车就是通过回文的性质优化了时间复杂度． 先在字符间插入一个不会出现的字符（通常使用’#’），使得字符串长度为奇数，然后搞一搞就出来了． 等有时间了回家好好写!12345678910111213141516171819202122#include &lt;cstdio&gt;#include &lt;cstring&gt;#define min(x,y) x &gt; y ? x = y : 0#define RI register intconst int N = 1000002;int n, maxid, id, ans, p[N &lt;&lt; 1];char c[N];int main() &#123; scanf("%s", c), n = strlen(c); for (RI i = n - 1; i &gt;= 0; --i) c[(i &lt;&lt; 1) + 2] = c[i], c[(i &lt;&lt; 1) + 3] = '#'; n = (n &lt;&lt; 1) + 2, c[0] = c[1] = '#'; for (RI i = 1; i &lt; n; ++i) &#123; if (i &lt; maxid) p[i] = min(p[(id &lt;&lt; 1) - i], p[id] + id - i); else p[i] = 1; while (c[i + p[i]] == c[i - p[i]]) ++p[i]; if (p[i] + i&gt; maxid) maxid = p[i] + i, id = i; ans += (p[i] &gt;&gt; 1); &#125; printf("%d", ans);&#125; 哦完结了！]]></content>
+      <categories>
+        <category>Problem</category>
+        <category>Algorithm</category>
+      </categories>
+      <tags>
+        <tag>string</tag>
+        <tag>manacher</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Suffix Sort]]></title>
+    <url>%2F20190307%2FSuffix-Array%2F</url>
+    <content type="text"><![CDATA[Suffix SortSuffix Array后缀数组是什么呢，懒得说了，直接上概念吧． 后缀数组$sa[i]$就表示排名为i的后缀的起始位置的下标 它的映射数组$rk[i]$就表示起始位置的下标为i的后缀的排名 简单来说，sa表示排名为i的是啥，rk表示第i个的排名是啥 等待填坑123456789101112131415161718192021222324252627282930313233343536373839404142#include &lt;cstdio&gt;#include &lt;cstring&gt;#include &lt;algorithm&gt;#define RI register intusing namespace std;const int CF = 1e6 + 10;char s[CF];int N, M, rak[CF], sa[CF], tax[CF], tp[CF];inline void qsort() &#123; for (RI i = 0; i &lt;= M; ++i) tax[i] = 0; for (RI i = 1; i &lt;= N; ++i) ++tax[rak[i]]; for (RI i = 1; i &lt;= M; ++i) tax[i] += tax[i - 1]; for (RI i = N; i &gt; 0; --i) sa[tax[rak[tp[i]]]--] = tp[i];&#125;inline void suffixsort() &#123; M = 75; for (RI i = 1; i &lt;= N; ++i) rak[i] = s[i] - '0' + 1, tp[i] = i; qsort(); for (RI w = 1, p = 0; p &lt; N; M = p, w &lt;&lt;= 1) &#123; p = 0; for (RI i = 1; i &lt;= w; ++i) tp[++p] = N - w + i; for (RI i = 1; i &lt;= N; ++i) if (sa[i] &gt; w) tp[++p] = sa[i] - w; qsort(); swap(tp, rak); rak[sa[1]] = p = 1; for (RI i = 2; i &lt;= N; ++i) rak[sa[i]] = (tp[sa[i - 1]] == tp[sa[i]] &amp;&amp; tp[sa[i - 1] + w] == tp[sa[i] + w]) ? p : ++p; &#125; for (RI i = 1; i &lt;= N; ++i) printf("%d ", sa[i]);&#125;int main() &#123; scanf("%s", s + 1); N = strlen(s + 1); suffixsort();&#125;]]></content>
+      <categories>
+        <category>Algorithm</category>
+      </categories>
+      <tags>
+        <tag>string</tag>
+        <tag>SA</tag>
+        <tag>sort</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[FastIO]]></title>
+    <url>%2F20190303%2FFastIO%2F</url>
+    <content type="text"><![CDATA[FastIO写程序总有想不到正解的时候，时间复杂度不合要求，便只能打暴力来骗点分，所以如何优化暴力便成为我这种菜鸡钻研的课题了． 既然在算法层面找不到突破口，那我就走一点歪门邪道． 除了算法，对程序运行时间影响最大的因素是什么？ 读入输出所以贴上究级代码 1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556namespace IO &#123; const int lim = 1 &lt;&lt; 20 | 500; char buf[lim + 5], *S, *T; inline char gc() &#123; if (S == T) &#123; T = (S = buf) + fread(buf, 1, lim, stdin); if (S == T) return EOF; &#125; return *S++; &#125; template &lt; typename T &gt; inline T read() &#123; T x; bool f; char c; for (f = 0; (c = gc()) &lt; '0' || c &gt; '9'; f = c == '-') ; for (x = c ^ '0'; (c = gc()) &gt;= '0' &amp;&amp; c &lt;= '9'; x = (x &lt;&lt; 1) + (x &lt;&lt; 3) + (c ^ '0')) ; return f ? -x : x; &#125; inline bool islegal(char c) &#123; return c &lt; -1 || (c &gt; 32 &amp;&amp; c &lt; 127); &#125; inline void readstring(char *str) &#123; char c; while (!islegal(c = gc())) ; for (*str++ = c; islegal(c = gc()); *str++ = c) ; *str = '\0'; &#125; char obuf[lim + 5], *OS; inline void flush_stdout() &#123; if (OS - obuf) fwrite(obuf, 1, OS - obuf, stdout), OS = obuf; &#125; inline void pc(char c) &#123; *OS++ = c; if (OS - obuf == lim) flush_stdout(); &#125; template &lt; typename T &gt; inline void print(T x, char c = '\n') &#123; if (x &lt; 0) x = -x, pc('-'); static int tmp[40], cnt; tmp[cnt = 0] = x % 10; x /= 10; for (; x; x /= 10) tmp[++cnt] = x % 10; for (; ~cnt; pc(tmp[cnt--] ^ '0')) ; pc(c); &#125; struct flusher &#123; flusher() &#123; OS = obuf; &#125; ~flusher() &#123; flush_stdout(); &#125; &#125; __flusher__;&#125; 调用方法 读入1n = IO::read &lt; int &gt; (); 输出1IO::print(ans); 实测光贴代码没说服力我们来看看真正的运行结果emmm对于一般情况速度都有明显提升，在这里我就懒得截屏了．]]></content>
+      <categories>
+        <category>skills</category>
+      </categories>
+      <tags>
+        <tag>FastIO</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Another Meaning]]></title>
+    <url>%2F20190224%2FAnother-Meaning%2F</url>
+    <content type="text"><![CDATA[Another MeaningDescription给出一段话$s$，和一个单词$t$，已知单词t别有深意，也就是说有两个意思，求$s$可能有多少种意思。答案对$1e9+7$取模。 FormatInput一个整数$n$，表示数据组数接下来就是$n$组$s$和$t$。 Output$n$行，对应每组数据的答案 ExampleInput1234567894hehehehehewoquxizaolehehewoquxizaolehehehehehehewoyaoqugenbierenliaotianlewanan Output12343251 Explanation原字样表示取原意，加粗字体表示取深意第一组：hehehe，hehehe，hehehe第三组：hehehehe，hehehehe，hehehehe，hehehehe，hehehehe Data$strlen(t)\,&lt;=\,strlen(s)\,&lt;=\,100000，\,n\,&lt;=\,10$ 仅有小写字符]]></content>
+      <categories>
+        <category>Problem</category>
+      </categories>
+      <tags>
+        <tag>DP</tag>
+        <tag>Hash</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Fibonacci Subsequence]]></title>
+    <url>%2F20190223%2FFibonacci%20Subsequence%2F</url>
+    <content type="text"><![CDATA[Fibonacci SubsequenceMusic!! Description斐波那契序列${A}$满足：$A_i = A_{i - 1} + A_{i - 2}$给出一个序列${C}$，求其中的最长斐波那契子序列 FormatInput一个整数$N$，代表序列长度$N$个数，第$i$个代表$C_i$ Output一个整数，代表子序列的长度 ExampleInput12101 1 3 -1 2 0 5 -1 -1 8 Output15 Explanation$1\,\,-1\,\,0\,\,-1\,\,-1$ 满足条件 Data$10\%$：满足$N\,∈\,[1,\,100]$$100\%$：$N &lt;= 3000,\,abs(C_i)\,&lt;=\,10^9$ 等待填坑。。。。。。]]></content>
+      <categories>
+        <category>Problem</category>
+      </categories>
+      <tags>
+        <tag>DP</tag>
+        <tag>Splay</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Party Lamps]]></title>
+    <url>%2F20190221%2FParty%20Lamps%2F</url>
+    <content type="text"><![CDATA[Party LampsDesciption在IOI98的节日宴会上，我们有$N(10&lt;=N&lt;=100)$盏彩色灯，他们分别从1到N被标上号码。 这些灯都连接到四个按钮： 按钮1：当按下此按钮，将改变所有的灯：本来亮着的灯就熄灭，本来是关着的灯被点亮。 按钮2：当按下此按钮，将改变所有奇数号的灯。 按钮3：当按下此按钮，将改变所有偶数号的灯。 按钮4：当按下此按钮，将改变所有序号是$3*K+1(K&gt;=0)$的灯。例如：$1,4,7…$ 一个计数器C记录按钮被按下的次数。当宴会开始，所有的灯都亮着，此时计数器C为0。 你将得到计数器$C(0&lt;=C&lt;=10000)$上的数值和经过若干操作后某些灯的状态。写一个程序去找出所有灯最后可能的与所给出信息相符的状态，并且没有重复。 FormatInput 不会有灯会在输入中出现两次。 第一行: N。 第二行: C最后显示的数值。 第三行: 最后亮着的灯,用一个空格分开，以-1为结束。 第四行: 最后关着的灯,用一个空格分开，以-1为结束。 Output 每一行是所有灯可能的最后状态(没有重复)。每一行有N个字符，第1个字符表示1号灯，最后一个字符表示N号灯。0表示关闭，1表示亮着。这些行必须从小到大排列（看作是二进制数）。 如果没有可能的状态，则输出一行’IMPOSSIBLE’。 ExampleInput1234101-17 -1 Output123000000000001010101010110110110 Analyse这道题可以发现一个操作如果操作了两次就相当于没有操作，所以第一个方法出现了！枚举此操作是否生效，并排除掉不能满足总按键次数的方法就AC了。 （并没有代码） 复杂度虽然满足题目要求了，但是我们还可以继续尝试优化对吧，毕竟题目都是在魔改中变得变态的。因为只有两个两个和三个三个的操作，那我们就可以把每六个看成一个整体，将序列拆成很多长度为六的序列，特判一下就可以在$O(n)$的时间内干翻这道题了（章口就莱）。 1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253#include &lt;bits/stdc++.h&gt;#define RI register intusing namespace std;int n, c, a, t1, t2, p, co, open[105], clse[105];int sit[9][8] = &#123; &#123;0, 0, 0, 0, 0, 0, 0&#125;, &#123;0, 0, 0, 0, 0, 0, 0&#125;, &#123;0, 0, 0, 1, 1, 1, 0&#125;, &#123;0, 0, 1, 0, 1, 0, 1&#125;, &#123;0, 0, 1, 1, 0, 1, 1&#125;, &#123;1, 1, 0, 0, 1, 0, 0&#125;, &#123;1, 1, 0, 1, 0, 1, 0&#125;, &#123;1, 1, 1, 0, 0, 0, 1&#125;, &#123;1, 1, 1, 1, 1, 1, 1&#125;&#125;;int main() &#123; ios::sync_with_stdio(0); cin &gt;&gt; n &gt;&gt; c; while ("tuliweiAKIOI") &#123; cin &gt;&gt; a; if (a != -1) open[++t1] = a; else break; &#125; while ("tuliweiAKIOI") &#123; cin &gt;&gt; a; if (a != -1) clse[++t2] = a; else break; &#125; if(!c) &#123; if (t2) cout &lt;&lt; "IMPOSSIBLE"; else for (RI i = 1; i &lt;= n; ++i) cout &lt;&lt; '1'; cout &lt;&lt; '\n'; return 0; &#125; for (RI i = 1; i &lt;= 8; ++i) &#123; for (RI j = 1; j &lt;= t1; ++j) if (!sit[i][(open[j] - 1) % 6 + 1]) p = 1; for (RI j = 1; j &lt;= t2; ++j) if (sit[i][(clse[j] - 1) % 6 + 1]) p = 1; if (!p) &#123; if (c == 1 &amp;&amp; (i == 2 || i == 5 || i == 7)) goto A; for (RI j = 1; j &lt;= n; ++j) cout &lt;&lt; sit[i][(j - 1) % 6 + 1]; cout &lt;&lt; '\n', co = 1; A:; &#125; else p = 0; &#125; if (!co) cout &lt;&lt; "IMPOSSIBLE\n";&#125; 完结撒花！]]></content>
+      <categories>
+        <category>Problem</category>
+      </categories>
+      <tags>
+        <tag>Search</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Ubuntu Theme]]></title>
+    <url>%2F20190221%2FUbuntu-Theme%2F</url>
+    <content type="text"><![CDATA[Ubuntu Theme入手 Ubuntu 时用的是NoiLinux（黑暗回忆），后来经大佬介绍转入 Ubuntu Budgie 18.04 LTS ．第一眼看上去界面相当精致，改下配色之后更是把 kewth 的 gnome 和 xfce 吊起来打． $$Pocillo$$ DownloadBudgie 的主题可以在应用商店里面下载，个人比较推荐 Pocillo 和 Material Design (Adapta)，但是 Adapta 的标题字体非常丑，建议自己调，其它的部分还是相当养眼的． $$Material\,Design\,(Adapta)$$ Modify默认提供的配置比较 s**t（尽管下了新主题），个人对于颜色喜欢黑色系，可以选择 Deep-Dark-Fantasy Pocillo-dark-slim． 默认图标样式不丑，但是过于黯淡，我选择了 Papirus-Adapta-Nokto，其实 Papirus 门下的主题只有细微的差别，其细致入微的考虑大大地提升了用户的体验． 所以我推荐用Budgie啦．]]></content>
+      <categories>
+        <category>System</category>
+      </categories>
+      <tags>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+</search>
